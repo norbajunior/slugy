@@ -1,6 +1,7 @@
 # Slugy
 
 ![hex](https://img.shields.io/badge/hex-v1.0.0-blue.svg)
+
 An Elixir Library to convert input strings into slugs.
 
 
