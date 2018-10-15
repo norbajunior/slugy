@@ -8,6 +8,7 @@ defmodule Slugy.MixProject do
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
       description: "A Phoenix library to generate slug for your schema fields",
+      elixirc_paths: elixirc_paths(Mix.env),
       package: package(),
       deps: deps()
     ]
@@ -36,4 +37,7 @@ defmodule Slugy.MixProject do
       links: %{"GitHub" => "https://github.com/appprova/slugy"},
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 end
