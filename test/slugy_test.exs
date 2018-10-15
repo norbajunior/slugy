@@ -12,6 +12,15 @@ defmodule SlugyTest do
     end
   end
 
+  defmodule PostWithEmbeddedStruct do
+    use Ecto.Schema
+
+    embedded_schema do
+      field(:data, :map) # => %Post{data: %{title: "A title"}}
+      field(:slug, :string)
+    end
+  end
+
   describe "slugify/2" do
     test "puts generated slug on changeset changes and returns changeset" do
       changeset = Changeset.cast(%Post{}, %{title: "A new post"}, [:title])
@@ -23,6 +32,15 @@ defmodule SlugyTest do
       changeset = Changeset.cast(%Post{}, %{}, [:title])
 
       assert %{changes: %{}} = Slugy.slugify(changeset, :name)
+    end
+
+    test "puts generated slug from an embedded struct field on changeset changes and returns changeset" do
+      changeset =
+        %PostWithEmbeddedStruct{}
+        |> Changeset.cast(%{data: %{title: "A new post"}}, [:data])
+
+      assert %{changes: %{slug: "a-new-post"}} =
+               Slugy.slugify(changeset, [:data, :title])
     end
   end
 
