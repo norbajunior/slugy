@@ -47,6 +47,28 @@ defmodule Slugy do
     end
   end
 
+  @doc ~S"""
+  ## Slugify a field from a embedded struct
+
+  In rare cases you need to generate the slug from a field inside another structure.
+  Just pass a list with the keys down to the desirable field.
+
+      %Content{
+        type: "text",
+        data: %{title: "Content 1", external_id: 1}
+      }
+
+      iex> slugify(changeset, [:data, :title])
+      %Ecto.Changeset{changes: %{slug: "content-1"}}
+  """
+  def slugify(changeset, nested_field) when is_list(nested_field) do
+    with str when not is_nil(str) <- get_in(changeset.changes, nested_field) do
+      put_change(changeset, :slug, generate_slug(str))
+    else
+      _ -> changeset
+    end
+  end
+
   @doc """
   Returns a downcased dashed string.
 
