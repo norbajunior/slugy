@@ -1,72 +1,110 @@
 defmodule Slugy do
   @moduledoc ~S"""
-  Slugy is a Phoenix library to generate slugs to ecto schema fields
+  A Phoenix library to generate slug for your schema fields
 
-  Let's suppose we have a Post schema and we want to generate a slug from `title` field
-  and save it to the `slug` field. To achieve that we need to call Slugy.slugify/2
-  following the changeset pipeline passing the desireable field. Slugy.slugify/2 generates
-  the slug and put it to the changeset.
+  ## Examples
 
-    defmodule Post do
-      import Slugy, only: [slugify: 2]
+  Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desireable field. `slugify/2` generates the slug and put it to the changeset.
 
-      schema "posts" do
-        field :title, :string
-        field :body, :text
-        field :published_at, :datetime
-        field :slug, :string
+      defmodule Post do
+        import Slugy, only: [slugify: 2]
+
+        schema "posts" do
+          field :title, :string
+          field :body, :text
+          field :slug, :string
+          field :published_at, :naive_datetime
+        end
+
+        def changeset(post, attrs) do
+          post
+          |> cast(attrs, [:title, :body, :published_at])
+          |> slugify(:title)
+        end
       end
 
-      def changeset(post, attrs) do
-        post
-        |> cast(attrs, [:title, :body, :published_at])
-        |> slugify(:title)
-      end
-    end
+  Running this code on iex console you can see the slug generated as a new change to be persisted.
+
+    	iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
+    	%Ecto.Changeset{changes: %{title: "A new Post", slug: "a-new-post"}}
+
+  Slugy just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
   """
   import Ecto.Changeset
   alias Slugy.Slug
 
   @doc ~S"""
-  Slugy.slugify/2 puts the slug generated on the given changeset and returns the changeset.
+  ### Usage
 
-  Returns the changeset itself if there are no changes to apply.
+  The `slugify/2` expects a changeset as a first parameter and an atom on the second one.
+  The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
-  ## Examples
+  iex> slugify(changeset, :title)
+  %Ecto.Changeset{changes: %{slug: "content-1"}}
 
-      iex> slugify(changeset, :name)
-      %Ecto.Changeset{changes: %{slug: "a-slug-string-generated-from-name"}}
+  ### Slugify from an embedded struct field
 
-      iex> slugify(changeset, :name)
-      %Ecto.Changeset{}
+  In rare cases you need to generate slugs from a field inside a embeded structure that represents a jsonb column on your database.
 
-  ## Slugify a field from a embedded struct
-
-  In rare cases you need to generate the slug from a field inside another structure.
-  Just pass a list with the keys down to the desirable field.
+  For example by having a struct like below and we want a slug from `data -> title`:
 
       %Content{
-        type: "text",
-        data: %{title: "Content 1", external_id: 1}
+      type: "text",
+      data: %{title: "Content 1", external_id: 1}
       }
+
+  Just pass a list with the keys following the path down to the desirable field.
 
       iex> slugify(changeset, [:data, :title])
       %Ecto.Changeset{changes: %{slug: "content-1"}}
 
-  ## Custom slug
+  ### Custom slug
 
-  If you want a custom slug composed for more than one fields e.g. a post title and the publication date
-  like so "how-to-use-slugy-2018-10-10" you need to implement the `Slugy.Slug protocol` that extracts
-  the desirable fields to generate the slug
+  If you want a custom slug composed for more than one fields **e.g.** a post `title` and the `published_at` like so `"how-to-use-slugy-video"` you need to implement the `Slug protocol` that extracts the desirable fields to generate the slug.
+
+      defmodule Post do
+      # ...
+      end
 
       defimpl Slugy.Slug, for: Post do
-        def to_slug(%{title: title, published_at: published_at}) do
-          "#{title} #{published_at}"
+        def to_slug(%{title: title, type: "video"}) do
+          "#{title} #{video}"
         end
       end
 
-  But you still have to use `Slugy.slugify/2` in changeset function like shown
-  on above examples to know whether the field was changed or not.
+  So, `%Post{title: "A new Post", type: "video"}` with the above `Slug` protocol implementation will have a slug like so `a-new-post-video`
+
+  ## Routes
+
+  And lastly for having our routes with the slug we just need to implement the `Phoenix.Param` protocol to our slugified schemas. `Phoenix.Param` will extract the slug in place of the `:id`.
+
+      defmodule Post do
+        @derive {Phoenix.Param, key: :slug}
+        schema "posts" do
+        # ...
+        end
+
+        def changeset(post, attrs) do
+        # ...
+        end
+      end
+
+  For more information about `Phoenix.Param` protocol see in [https://hexdocs.pm/phoenix/Phoenix.Param.html](https://hexdocs.pm/phoenix/Phoenix.Param.html)
+
+  ## Installation
+
+  Add to your `mix.exs` file.
+
+      def deps do
+      [
+        {:slugy, "~> 0.1.0"}
+      ]
+      end
+
+  Don’t forget to update your dependencies.
+
+      $ mix deps.get
+
   """
   def slugify(changeset, key) when is_atom(key) do
     if str = get_change(changeset, key) do
