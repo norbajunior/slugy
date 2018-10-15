@@ -31,6 +31,7 @@ defmodule Slugy.MixProject do
   defp package() do
     [
       licenses: ["MIT"],
+      maintainers: ["Norberto Oliveira Junior", "Cairo Noleto"],
       files: ~w(lib mix.exs README* LICENSE*),
       links: %{"GitHub" => "https://github.com/appprova/slugy"},
     ]
