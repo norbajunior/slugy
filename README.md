@@ -1,11 +1,10 @@
 # Slugy
 
-**TODO: Add description**
+Is your library to create slug from string.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `slugy` to your list of dependencies in `mix.exs`:
+Add to your `mix.exs` file.
 
 ```elixir
 def deps do
