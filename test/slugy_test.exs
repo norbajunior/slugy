@@ -2,6 +2,7 @@ defmodule SlugyTest do
   use ExUnit.Case
 
   alias Ecto.Changeset
+  alias Slugy.Support.Content
 
   defmodule Post do
     use Ecto.Schema
@@ -41,6 +42,16 @@ defmodule SlugyTest do
 
       assert %{changes: %{slug: "a-new-post"}} =
                Slugy.slugify(changeset, [:data, :title])
+    end
+  end
+
+  describe "slugify/2 in a module that implements Slug protocol" do
+    test "puts custom generated slug on changeset changes and returns changeset" do
+      attrs = %{name: "Processo Penal", type: "video"}
+
+      changeset = Changeset.cast(%Content{}, attrs, [:name, :type])
+
+      assert %{changes: %{slug: "processo-penal-video"}} = Slugy.slugify(changeset, :name)
     end
   end
 
