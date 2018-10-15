@@ -96,7 +96,7 @@ defmodule Slugy do
 
       def deps do
       [
-        {:slugy, "~> 0.1.0"}
+        {:slugy, "~> 1.0.0"}
       ]
       end
 
