@@ -4,10 +4,10 @@ defmodule Slugy.MixProject do
   def project do
     [
       app: :slugy,
-      version: "0.1.0",
+      version: "1.0.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
-      description: "Is your library to create slug from string.",
+      description: "A Phoenix library to generate slug for your schema fields",
       package: package(),
       deps: deps()
     ]
