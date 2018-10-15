@@ -12,12 +12,11 @@ defmodule Post do
     field :title, :string
     field :body, :text
     field :slug, :string
-    field :published_at, :naive_datetime
   end
 
   def changeset(post, attrs) do
     post
-    |> cast(attrs, [:title, :body, :published_at])
+    |> cast(attrs, [:title, :body])
     |> slugify(:title)
   end
 end
@@ -56,7 +55,7 @@ Just pass a list with the keys following the path down to the desirable field.
 
 ### Custom slug
 
-If you want a custom slug composed for more than one fields **e.g.** a post `title` and the `published_at` like so `"how-to-use-slugy-video"` you need to implement the `Slug protocol` that extracts the desirable fields to generate the slug.
+If you want a custom slug composed for more than one fields **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to implement the `Slug protocol` that extracts the desirable fields to generate the slug.
 
 ```elixir
 defmodule Post do
@@ -64,8 +63,8 @@ defmodule Post do
 end
 
 defimpl Slugy.Slug, for: Post do
-  def to_slug(%{title: title, type: "video"}) do
-    "#{title} #{video}"
+  def to_slug(%{title: title, type: type}) do
+    "#{title} #{type}"
   end
 end
 ```
