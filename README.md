@@ -72,6 +72,13 @@ end
 
 So, `%Post{title: "A new Post", body: "Post body", type: "video"}` with the above `Slug` protocol implementation will have a slug like so `a-new-post-video`
 
+### Without a changeset
+In cases we just want to get the slug string without a changeset involved we can use
+`slugify/1` to achieve that.
+
+    iex> slugify("Slugy is awesome")
+    "slugy-is-awesome"
+
 ## Routes
 
 And lastly for having our routes with the slug we just need to implement the `Phoenix.Param` protocol to our slugified schemas. `Phoenix.Param` will extract the slug in place of the `:id`.
