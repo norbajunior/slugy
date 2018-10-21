@@ -144,7 +144,7 @@ defmodule Slugy do
 
   ## Examples
 
-      iex> slugify("Vamo que vamo")
+      iex> Slugy.slugify("Vamo que vamo")
       "vamo-que-vamo"
   """
   def slugify(str) when is_binary(str) do
