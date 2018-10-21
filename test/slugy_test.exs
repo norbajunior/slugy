@@ -55,8 +55,8 @@ defmodule SlugyTest do
     end
   end
 
-  describe "generate_slug/1" do
-    assert Slugy.generate_slug("Hey ow lets go") == "hey-ow-lets-go"
-    assert Slugy.generate_slug("Olá, julia") == "ola-julia"
+  test "slugify/1" do
+    assert Slugy.slugify("Hey ow lets go") == "hey-ow-lets-go"
+    assert Slugy.slugify("Olá, julia") == "ola-julia"
   end
 end
