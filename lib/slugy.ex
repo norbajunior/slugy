@@ -139,32 +139,32 @@ defmodule Slugy do
     end
   end
 
-  defp do_slugify(changeset, str) do
-    struct = Map.merge(changeset.data, changeset.changes)
-
-    if Slug.impl_for(struct) do
-      slug = struct |> Slug.to_slug() |> generate_slug()
-
-      put_change(changeset, :slug, slug)
-    else
-      put_change(changeset, :slug, generate_slug(str))
-    end
-  end
-
   @doc """
   Returns a downcased dashed string.
 
   ## Examples
 
-      iex> Slugy.generate_slug("Vamo que vamo")
+      iex> slugify("Vamo que vamo")
       "vamo-que-vamo"
   """
-  def generate_slug(str) do
+  def slugify(str) when is_binary(str) do
     str
     |> String.normalize(:nfd)
     |> String.replace(~r/[^A-z\s\d]/u, "")
     |> String.replace(~r/\s/, "-")
     |> String.downcase()
+  end
+
+  defp do_slugify(changeset, str) do
+    struct = Map.merge(changeset.data, changeset.changes)
+
+    if Slug.impl_for(struct) do
+      slug = struct |> Slug.to_slug() |> slugify()
+
+      put_change(changeset, :slug, slug)
+    else
+      put_change(changeset, :slug, slugify(str))
+    end
   end
 end
 
