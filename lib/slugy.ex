@@ -7,25 +7,26 @@ defmodule Slugy do
   Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desireable field. `slugify/2` generates the slug and put it to the changeset.
 
       defmodule Post do
+        use Ecto.Schema
+        import Ecto.Changeset
         import Slugy, only: [slugify: 2]
 
-        schema "posts" do
-          field :title, :string
-          field :body, :text
-          field :slug, :string
+        embedded_schema do
+          field(:title, :string)
+          field(:slug, :string)
         end
 
         def changeset(post, attrs) do
           post
-          |> cast(attrs, [:title, :body])
+          |> cast(attrs, [:title])
           |> slugify(:title)
         end
       end
 
   Running this code on iex console you can see the slug generated as a new change to be persisted.
 
-    	iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
-    	%Ecto.Changeset{changes: %{title: "A new Post", slug: "a-new-post"}}
+    iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
+    %{title: "A new Post", slug: "a-new-post"}
 
   Slugy just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
   """
@@ -38,8 +39,8 @@ defmodule Slugy do
   The `slugify/2` expects a changeset as a first parameter and an atom on the second one.
   The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
-  iex> slugify(changeset, :title)
-  %Ecto.Changeset{changes: %{slug: "content-1"}}
+    iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
+    %{slug: "a-new-post", title: "A new Post"}
 
   ### Slugify from an embedded struct field
 
@@ -47,15 +48,32 @@ defmodule Slugy do
 
   For example by having a struct like below and we want a slug from `data -> title`:
 
-      %Content{
-      type: "text",
-      data: %{title: "Content 1", external_id: 1}
-      }
+
+    defmodule PostWithEmbeddedStruct do
+      use Ecto.Schema
+      import Ecto.Changeset
+      import Slugy, only: [slugify: 2]
+
+      embedded_schema do
+        field(:data, :map)
+        field(:slug, :string)
+      end
+
+      def changeset(post, attrs) do
+        post
+        |> cast(attrs, [:data])
+        |> slugify([:data, :title])
+      end
+    end
+
+    %PostWithEmbeddedStruct{
+      data: %{title: "This is my AWESOME title", external_id: 1}
+    }
 
   Just pass a list with the keys following the path down to the desirable field.
 
-      iex> slugify(changeset, [:data, :title])
-      %Ecto.Changeset{changes: %{slug: "content-1"}}
+    iex> PostWithEmbeddedStruct.changeset(%PostWithEmbeddedStruct{}, %{data: %{title: "This is my AWESOME title"}}).changes
+    %{data: %{title: "This is my AWESOME title"}, slug: "this-is-my-awesome-title"}
 
   ### Custom slug
 
