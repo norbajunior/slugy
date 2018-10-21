@@ -1,4 +1,5 @@
 # Slugy
+[![Build Status](https://travis-ci.com/appprova/slugy.svg?branch=master)](https://travis-ci.com/appprova/slugy)
 
 A Phoenix library to generate slug for your schema fields
 
