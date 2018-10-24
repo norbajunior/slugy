@@ -76,5 +76,9 @@ defmodule SlugyTest do
   test "slugify/1" do
     assert Slugy.slugify("Hey ow lets go") == "hey-ow-lets-go"
     assert Slugy.slugify("Olá, julia") == "ola-julia"
+    assert Slugy.slugify("   Please, trim   ") == "please-trim"
+    assert Slugy.slugify("Multiple   spaces") == "multiple-spaces"
+    assert Slugy.slugify("The Strokes - Under Cover of Darkness") == "the-strokes-under-cover-of-darkness"
+    assert Slugy.slugify("Keep the hyphen: build-up") == "keep-the-hyphen-build-up"
   end
 end
