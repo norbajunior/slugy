@@ -149,9 +149,12 @@ defmodule Slugy do
   """
   def slugify(str) when is_binary(str) do
     str
+    |> String.trim()
     |> String.normalize(:nfd)
-    |> String.replace(~r/[^A-z\s\d]/u, "")
+    |> String.replace(~r/\s\s+/, " ")
+    |> String.replace(~r/[^A-z\s\d-]/u, "")
     |> String.replace(~r/\s/, "-")
+    |> String.replace(~r/--+/, "-")
     |> String.downcase()
   end
 
