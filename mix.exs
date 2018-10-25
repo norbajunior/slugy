@@ -4,7 +4,7 @@ defmodule Slugy.MixProject do
   def project do
     [
       app: :slugy,
-      version: "1.2.0",
+      version: "1.2.1",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
       description: "A Phoenix library to generate slug for your schema fields",
