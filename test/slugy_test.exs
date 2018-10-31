@@ -46,5 +46,6 @@ defmodule SlugyTest do
     assert Slugy.slugify("Multiple   spaces") == "multiple-spaces"
     assert Slugy.slugify("The Strokes - Under Cover of Darkness") == "the-strokes-under-cover-of-darkness"
     assert Slugy.slugify("Keep the hyphen: build-up") == "keep-the-hyphen-build-up"
+    assert Slugy.slugify("Straße, München") == "strasse-muenchen"
   end
 end

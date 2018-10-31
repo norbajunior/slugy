@@ -147,8 +147,10 @@ defmodule Slugy do
       iex> Slugy.slugify("Vamo que vamo")
       "vamo-que-vamo"
   """
+  @language :german
   def slugify(str) when is_binary(str) do
     str
+    |> transliterate(@language)
     |> String.trim()
     |> String.normalize(:nfd)
     |> String.replace(~r/\s\s+/, " ")
@@ -169,6 +171,19 @@ defmodule Slugy do
       put_change(changeset, :slug, slugify(str))
     end
   end
+
+  defp transliterate(str, :german) do
+    str
+    |> String.split("")
+    |> Enum.map_join("", fn letter ->
+      case Map.get(%{"ä" => "ae", "ö" => "oe", "ü" => "ue", "Ä" => "AE", "Ö" => "OE", "Ü" => "UE", "ß" => "ss"}, letter) do
+        nil -> letter
+        result -> result
+      end
+    end)
+  end
+
+  defp transliterate(str, _language), do: str
 end
 
 defprotocol Slugy.Slug do
