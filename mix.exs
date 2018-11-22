@@ -4,10 +4,10 @@ defmodule Slugy.MixProject do
   def project do
     [
       app: :slugy,
-      version: "1.2.1",
       elixir: "~> 1.6",
+      version: "2.0.0",
       start_permanent: Mix.env() == :prod,
-      description: "A Phoenix library to generate slug for your schema fields",
+      description: "A Phoenix library to generate slug for your schemas",
       elixirc_paths: elixirc_paths(Mix.env),
       package: package(),
       deps: deps()
@@ -25,7 +25,7 @@ defmodule Slugy.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:ecto, "~> 2.2"}
+      {:ecto, "~> 3.0.3"}
     ]
   end
 

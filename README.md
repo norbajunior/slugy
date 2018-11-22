@@ -135,10 +135,19 @@ Add to your `mix.exs` file.
 ```elixir
 def deps do
   [
-    {:slugy, "~> 1.2.1"}
+    {:slugy, "~> 2.0.0"} # => compatible with ecto ~> 3.0
   ]
 end
 ```
+
+```elixir
+def deps do
+  [
+    {:slugy, "~> 1.2.1"} # => compatible with ecto ~> 2.2
+  ]
+end
+```
+
 Don’t forget to update your dependencies.
 
 ```
