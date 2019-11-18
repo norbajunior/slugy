@@ -16,7 +16,7 @@ defmodule SlugyTest do
     test "returns changeset when there is no changes to apply" do
       changeset = Changeset.cast(%Post{}, %{}, [:title])
 
-      assert %{changes: %{}} = Slugy.slugify(changeset, :name)
+      assert %{changes: %{}} = Slugy.slugify(changeset, :title)
     end
 
     test "puts generated slug from an embedded struct field on changeset changes and returns changeset" do
