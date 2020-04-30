@@ -34,17 +34,15 @@ defmodule Slugy do
   import Ecto.Changeset
 
   @doc ~S"""
-  ## Usage
+  The `slugify/2` expects a changeset as a first parameter and an atom to the second one.
+  The function will check if there is a change on the "key" field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
-  The `slugify/2` expects a changeset as a first parameter and an atom on the second one.
-  The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
-
-    iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
-    %{slug: "a-new-post", title: "A new Post"}
+      iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
+      %{slug: "a-new-post", title: "A new Post"}
 
   ## Composed slug
 
-  If you want a custom composed slug for more than one field **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of fields.
+  If you need a composed slug **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of atom keys.
 
       defmodule Content do
         use Ecto.Schema
