@@ -8,7 +8,7 @@ defmodule Slugy.MixProject do
       version: "2.0.0",
       start_permanent: Mix.env() == :prod,
       description: "A Phoenix library to generate slug for your schemas",
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       deps: deps()
     ]
@@ -34,7 +34,7 @@ defmodule Slugy.MixProject do
       licenses: ["MIT"],
       maintainers: ["Norberto Oliveira Junior", "Cairo Noleto"],
       files: ~w(lib mix.exs README* LICENSE*),
-      links: %{"GitHub" => "https://github.com/appprova/slugy"},
+      links: %{"GitHub" => "https://github.com/norbajunior/slugy"}
     ]
   end
 
