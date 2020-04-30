@@ -13,7 +13,6 @@ defmodule Slugy do
 
         embedded_schema do
           field(:title, :string)
-          field(:type, :string)
           field(:slug, :string)
         end
 
