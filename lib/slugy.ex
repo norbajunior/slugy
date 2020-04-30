@@ -125,7 +125,8 @@ defmodule Slugy do
 
   """
   def slugify(changeset, with: fields) when is_list(fields) do
-    with str when not is_nil(str) <- compose_fields(changeset, fields) do
+    with true <- any_change?(changeset, fields),
+         str when not is_nil(str) <- compose_fields(changeset, fields) do
       put_change(changeset, :slug, slugify(str))
     else
       _ -> changeset
@@ -170,6 +171,10 @@ defmodule Slugy do
   defp compose_fields(_changeset, []), do: ""
 
   defp compose_fields(changeset, [head | tail]) do
-    "#{get_change(changeset, head)} " <> compose_fields(changeset, tail)
+    "#{get_field(changeset, head)} " <> compose_fields(changeset, tail)
+  end
+
+  defp any_change?(changeset, fields) do
+    Enum.any?(fields, fn field -> get_change(changeset, field) end)
   end
 end

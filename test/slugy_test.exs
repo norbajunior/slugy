@@ -1,5 +1,5 @@
 defmodule SlugyTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   alias Ecto.Changeset
   alias Slugy.Support.{Content, Post, PostWithMapField}
@@ -34,6 +34,27 @@ defmodule SlugyTest do
 
       assert %{changes: %{slug: "processo-penal-video"}} =
                Slugy.slugify(changeset, with: [:name, :type])
+    end
+
+    test "if just one of the fields has changes generate the slug and returns the changeset" do
+      attrs = %{type: "image"}
+
+      changeset =
+        %Content{name: "Processo Penal", type: "video"}
+        |> Changeset.cast(attrs, [:name, :type])
+
+      assert %{changes: %{slug: "processo-penal-image"}} =
+               Slugy.slugify(changeset, with: [:name, :type])
+    end
+
+    test "if none of the fields has changes does not generate the slug and returns the changeset" do
+      attrs = %{name: "Processo Penal", type: "video"}
+
+      changeset =
+        %Content{name: "Processo Penal", type: "video", slug: "processo-penal-video"}
+        |> Changeset.cast(attrs, [:name, :type])
+
+      assert %{changes: %{}} = Slugy.slugify(changeset, with: [:name, :type])
     end
   end
 
