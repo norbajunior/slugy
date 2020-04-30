@@ -1,10 +1,10 @@
-defmodule Slugy.Support.PostWithEmbeddedStruct do
+defmodule Slugy.Support.PostWithMapField do
   use Ecto.Schema
   import Ecto.Changeset
   import Slugy, only: [slugify: 2]
 
   embedded_schema do
-    field(:data, :map) # => %PostWithEmbeddedStruct{data: %{title: "A title"}}
+    field(:data, :map)
     field(:slug, :string)
   end
 

@@ -2,7 +2,7 @@ defmodule SlugyTest do
   use ExUnit.Case
 
   alias Ecto.Changeset
-  alias Slugy.Support.{Content, Post, PostWithEmbeddedStruct}
+  alias Slugy.Support.{Content, Post, PostWithMapField}
 
   doctest Slugy
 
@@ -21,7 +21,7 @@ defmodule SlugyTest do
 
     test "puts generated slug from an embedded struct field on changeset changes and returns changeset" do
       changeset =
-        %PostWithEmbeddedStruct{}
+        %PostWithMapField{}
         |> Changeset.cast(%{data: %{title: "A new post"}}, [:data])
 
       assert %{changes: %{slug: "a-new-post"}} =
