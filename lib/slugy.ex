@@ -25,8 +25,8 @@ defmodule Slugy do
 
   Running this code on iex console you can see the slug generated as a new change to be persisted.
 
-    iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
-    %{title: "A new Post", slug: "a-new-post"}
+      iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
+      %{title: "A new Post", slug: "a-new-post"}
 
   Slugy just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
   """
@@ -49,31 +49,31 @@ defmodule Slugy do
   For example by having a struct like below and we want a slug from `data -> title`:
 
 
-    defmodule PostWithEmbeddedStruct do
-      use Ecto.Schema
-      import Ecto.Changeset
-      import Slugy, only: [slugify: 2]
+      defmodule PostWithEmbeddedStruct do
+        use Ecto.Schema
+        import Ecto.Changeset
+        import Slugy, only: [slugify: 2]
 
-      embedded_schema do
-        field(:data, :map)
-        field(:slug, :string)
+        embedded_schema do
+          field(:data, :map)
+          field(:slug, :string)
+        end
+
+        def changeset(post, attrs) do
+          post
+          |> cast(attrs, [:data])
+          |> slugify([:data, :title])
+        end
       end
 
-      def changeset(post, attrs) do
-        post
-        |> cast(attrs, [:data])
-        |> slugify([:data, :title])
-      end
-    end
-
-    %PostWithEmbeddedStruct{
-      data: %{title: "This is my AWESOME title", external_id: 1}
-    }
+      %PostWithEmbeddedStruct{
+        data: %{title: "This is my AWESOME title", external_id: 1}
+      }
 
   Just pass a list with the keys following the path down to the desirable field.
 
-    iex> PostWithEmbeddedStruct.changeset(%PostWithEmbeddedStruct{}, %{data: %{title: "This is my AWESOME title"}}).changes
-    %{data: %{title: "This is my AWESOME title"}, slug: "this-is-my-awesome-title"}
+      iex> PostWithEmbeddedStruct.changeset(%PostWithEmbeddedStruct{}, %{data: %{title: "This is my AWESOME title"}}).changes
+      %{data: %{title: "This is my AWESOME title"}, slug: "this-is-my-awesome-title"}
 
   ### Custom slug
 
@@ -113,9 +113,9 @@ defmodule Slugy do
   Add to your `mix.exs` file.
 
       def deps do
-      [
-        {:slugy, "~> 2.0.0"}
-      ]
+        [
+          {:slugy, "~> 2.0.0"}
+        ]
       end
 
   Don’t forget to update your dependencies.
