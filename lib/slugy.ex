@@ -13,12 +13,13 @@ defmodule Slugy do
 
         embedded_schema do
           field(:title, :string)
+          field(:type, :string)
           field(:slug, :string)
         end
 
         def changeset(post, attrs) do
           post
-          |> cast(attrs, [:title])
+          |> cast(attrs, [:title, :type])
           |> slugify(:title)
         end
       end
@@ -31,10 +32,9 @@ defmodule Slugy do
   Slugy just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
   """
   import Ecto.Changeset
-  alias Slugy.Slug
 
   @doc ~S"""
-  ### Usage
+  ## Usage
 
   The `slugify/2` expects a changeset as a first parameter and an atom on the second one.
   The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
@@ -42,21 +42,45 @@ defmodule Slugy do
     iex> Post.changeset(%Post{}, %{title: "A new Post"}).changes
     %{slug: "a-new-post", title: "A new Post"}
 
-  ### Slugify from an embedded struct field
+  ## Composed slug
 
-  In rare cases you need to generate slugs from a field inside a embeded structure that represents a jsonb column on your database.
+  If you want a custom composed slug for more than one field **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of fields.
 
-  For example by having a struct like below and we want a slug from `data -> title`:
-
-
-      defmodule PostWithEmbeddedStruct do
+      defmodule Content do
         use Ecto.Schema
         import Ecto.Changeset
         import Slugy, only: [slugify: 2]
 
         embedded_schema do
-          field(:data, :map)
-          field(:slug, :string)
+          field :name, :string
+          field :type, :string
+          field :slug, :string
+        end
+
+        def changeset(post, attrs) do
+          post
+          |> cast(attrs, [:name, :type])
+          |> slugify(with: [:name, :type])
+        end
+      end
+
+      iex> Content.changeset(%Content{}, %{name: "Elixir", type: "video"}).changes
+      %{name: "Elixir", type: "video", slug: "elixir-video"}
+
+  ## Slugify from a map field
+
+  In rare cases you need to generate slugs from a field inside a map field that represents a jsonb column on your database.
+
+  For example by having a struct like below and we want a slug from `data -> title`:
+
+      defmodule PostWithMapField do
+        use Ecto.Schema
+        import Ecto.Changeset
+        import Slugy, only: [slugify: 2]
+
+        embedded_schema do
+          field :data, :map
+          field :slug, :string
         end
 
         def changeset(post, attrs) do
@@ -66,30 +90,10 @@ defmodule Slugy do
         end
       end
 
-      %PostWithEmbeddedStruct{
-        data: %{title: "This is my AWESOME title", external_id: 1}
-      }
-
   Just pass a list with the keys following the path down to the desirable field.
 
-      iex> PostWithEmbeddedStruct.changeset(%PostWithEmbeddedStruct{}, %{data: %{title: "This is my AWESOME title"}}).changes
+      iex> PostWithMapField.changeset(%PostWithMapField{}, %{data: %{title: "This is my AWESOME title"}}).changes
       %{data: %{title: "This is my AWESOME title"}, slug: "this-is-my-awesome-title"}
-
-  ### Custom slug
-
-  If you want a custom slug composed for more than one fields **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to implement the `Slug protocol` that extracts the desirable fields to generate the slug.
-
-      defmodule Post do
-      # ...
-      end
-
-      defimpl Slugy.Slug, for: Post do
-        def to_slug(%{title: title, type: type}) do
-          "#{title} #{type}"
-        end
-      end
-
-  So, `%Post{title: "A new Post", type: "video"}` with the above `Slug` protocol implementation will have a slug like so `a-new-post-video`
 
   ## Routes
 
@@ -123,9 +127,17 @@ defmodule Slugy do
       $ mix deps.get
 
   """
+  def slugify(changeset, with: fields) when is_list(fields) do
+    with str when not is_nil(str) <- compose_fields(changeset, fields) do
+      put_change(changeset, :slug, slugify(str))
+    else
+      _ -> changeset
+    end
+  end
+
   def slugify(changeset, key) when is_atom(key) do
     if str = get_change(changeset, key) do
-      do_slugify(changeset, str)
+      put_change(changeset, :slug, slugify(str))
     else
       changeset
     end
@@ -133,7 +145,7 @@ defmodule Slugy do
 
   def slugify(changeset, nested_field) when is_list(nested_field) do
     with str when not is_nil(str) <- get_in(changeset.changes, nested_field) do
-      do_slugify(changeset, str)
+      put_change(changeset, :slug, slugify(str))
     else
       _ -> changeset
     end
@@ -158,48 +170,9 @@ defmodule Slugy do
     |> String.downcase()
   end
 
-  defp do_slugify(changeset, str) do
-    struct = Map.merge(changeset.data, changeset.changes)
+  defp compose_fields(_changeset, []), do: ""
 
-    if Slug.impl_for(struct) do
-      slug = struct |> Slug.to_slug() |> slugify()
-
-      put_change(changeset, :slug, slug)
-    else
-      put_change(changeset, :slug, slugify(str))
-    end
+  defp compose_fields(changeset, [head | tail]) do
+    "#{get_change(changeset, head)} " <> compose_fields(changeset, tail)
   end
-end
-
-defprotocol Slugy.Slug do
-  @moduledoc ~S"""
-  A protocol that builds a string to converts into a slug
-
-  This protocol is used by Slugy.slugify/2. For example, when you
-  want a custom slug for a Post, composed by the `title` and the
-  `published_at` fields:
-
-      "how-to-use-slugy-2018-10-10"
-
-  Suppose you have a Post module with the following fields:
-
-      defmodule Post do
-        schema "posts" do
-          field :title, :string
-          field :body, :text
-          field :published_at, :datetime
-        end
-      end
-
-  You need to implement the Slugy.Slug protocol to achieve that:
-
-      defimpl Slugy.Slug, for: Post do
-        def to_slug(%{title: title, published_at: published_at}) do
-          "#{title} #{published_at}"
-        end
-      end
-
-  Slugy internally uses this string to build your custom slug.
-  """
-  def to_slug(struct)
 end

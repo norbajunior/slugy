@@ -25,8 +25,10 @@ end
 
 Running this code on iex console you can see the slug generated as a new change to be persisted.
 
-	  iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
-	  %Ecto.Changeset{changes: %{title: "A new Post", slug: "a-new-post"}}
+```
+iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
+%Ecto.Changeset{changes: %{title: "A new Post", slug: "a-new-post"}}
+```
 
 `slugify/2` just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
 
@@ -34,12 +36,35 @@ Running this code on iex console you can see the slug generated as a new change 
 
 The `slugify/2` expects a changeset as a first parameter and an atom on the second one. The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
-	iex> slugify(changeset, :title)
-	%Ecto.Changeset{changes: %{slug: "content-1"}}
+```
+iex> Slugy.slugify(changeset, :title)
+%Ecto.Changeset{changes: %{slug: "content-1"}}
+```
 
-### Slugify from an embedded struct field
+### Composed slug
 
-In rare cases you need to generate slugs from a field inside a embeded structure that represents a jsonb column on your database.
+If you want a custom composed slug for more than one field **e.g.** a content `name` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of fields.
+
+```elixir
+defmodule Content do
+  # ...
+
+  def changeset(post, attrs) do
+    post
+    |> cast(attrs, [:name, :type])
+    |> slugify(with: [:name, :type])
+  end
+end
+```
+
+```
+iex> Content.changeset(%Content{}, %{name: "How to use Slugy", type: "video"}).changes
+%{slug: "How to use Slugy", type: "video", slug: "how-to-use-slugy-video"}
+```
+
+### Slugify from a map field
+
+In rare cases you need to generate slugs from a key value inside a map field that represents a jsonb column on your database.
 
 For example by having a struct like below and we want a slug from `data -> title`:
 
@@ -49,35 +74,21 @@ For example by having a struct like below and we want a slug from `data -> title
   data: %{title: "Content 1", external_id: 1}
 }
 ```
-Just pass a list with the keys following the path down to the desirable field.
+Just pass a list with the keys following the path up to the desirable field.
 
-      iex> slugify(changeset, [:data, :title])
-      %Ecto.Changeset{changes: %{slug: "content-1"}}
-
-### Custom slug
-
-If you want a custom slug composed for more than one fields **e.g.** a post `title` and the `type` like so `"how-to-use-slugy-video"` you need to implement the `Slug protocol` that extracts the desirable fields to generate the slug.
-
-```elixir
-defmodule Post do
-  # ...
-end
-
-defimpl Slugy.Slug, for: Post do
-  def to_slug(%{title: title, type: type}) do
-    "#{title} #{type}"
-  end
-end
 ```
-
-So, `%Post{title: "A new Post", body: "Post body", type: "video"}` with the above `Slug` protocol implementation will have a slug like so `a-new-post-video`
+iex> Slugy.slugify(changeset, [:data, :title])
+%Ecto.Changeset{changes: %{slug: "content-1"}}
+```
 
 ### Without a changeset
 In cases we just want to get the slug string without a changeset involved we can use
 `slugify/1` to achieve that.
 
-    iex> slugify("Slugy is awesome")
-    "slugy-is-awesome"
+```
+iex> Slugy.slugify("Slugy is awesome")
+"slugy-is-awesome"
+```
 
 ## Routes
 
@@ -100,8 +111,7 @@ For more information about `Phoenix.Param` protocol see in [https://hexdocs.pm/p
 
 ## Add slug field as a unique index
 
-To make sure slug is always unique we can add a unique constraint to our
-slug column
+To make sure slug is always unique we can add a unique constraint to our slug column
 
 ```elixir
 defmodule MyApp.Migrations.AddSlugToPosts do
@@ -135,15 +145,7 @@ Add to your `mix.exs` file.
 ```elixir
 def deps do
   [
-    {:slugy, "~> 2.0.0"} # => compatible with ecto ~> 3.0
-  ]
-end
-```
-
-```elixir
-def deps do
-  [
-    {:slugy, "~> 1.2.1"} # => compatible with ecto ~> 2.2
+    {:slugy, "~> 4.0.0"}
   ]
 end
 ```

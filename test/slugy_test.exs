@@ -24,18 +24,16 @@ defmodule SlugyTest do
         %PostWithMapField{}
         |> Changeset.cast(%{data: %{title: "A new post"}}, [:data])
 
-      assert %{changes: %{slug: "a-new-post"}} =
-               Slugy.slugify(changeset, [:data, :title])
+      assert %{changes: %{slug: "a-new-post"}} = Slugy.slugify(changeset, [:data, :title])
     end
-  end
 
-  describe "slugify/2 in a module that implements Slug protocol" do
-    test "puts custom generated slug on changeset changes and returns changeset" do
+    test "puts composed generated slug on changeset changes and returns changeset" do
       attrs = %{name: "Processo Penal", type: "video"}
 
       changeset = Changeset.cast(%Content{}, attrs, [:name, :type])
 
-      assert %{changes: %{slug: "processo-penal-video"}} = Slugy.slugify(changeset, :name)
+      assert %{changes: %{slug: "processo-penal-video"}} =
+               Slugy.slugify(changeset, with: [:name, :type])
     end
   end
 
@@ -44,7 +42,10 @@ defmodule SlugyTest do
     assert Slugy.slugify("Olá, julia") == "ola-julia"
     assert Slugy.slugify("   Please, trim   ") == "please-trim"
     assert Slugy.slugify("Multiple   spaces") == "multiple-spaces"
-    assert Slugy.slugify("The Strokes - Under Cover of Darkness") == "the-strokes-under-cover-of-darkness"
+
+    assert Slugy.slugify("The Strokes - Under Cover of Darkness") ==
+             "the-strokes-under-cover-of-darkness"
+
     assert Slugy.slugify("Keep the hyphen: build-up") == "keep-the-hyphen-build-up"
   end
 end
