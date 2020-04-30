@@ -4,6 +4,7 @@ defmodule Slugy.Support.Content do
   embedded_schema do
     field(:name, :string)
     field(:type, :string)
+    field(:slug, :string)
   end
 end
 
