@@ -9,7 +9,7 @@ defmodule Slugy do
       defmodule Post do
         use Ecto.Schema
         import Ecto.Changeset
-        import Slugy, only: [slugify: 2]
+        import Slugy
 
         embedded_schema do
           field(:title, :string)
@@ -46,7 +46,7 @@ defmodule Slugy do
       defmodule Content do
         use Ecto.Schema
         import Ecto.Changeset
-        import Slugy, only: [slugify: 2]
+        import Slugy
 
         embedded_schema do
           field :name, :string
@@ -73,7 +73,7 @@ defmodule Slugy do
       defmodule PostWithMapField do
         use Ecto.Schema
         import Ecto.Changeset
-        import Slugy, only: [slugify: 2]
+        import Slugy
 
         embedded_schema do
           field :data, :map

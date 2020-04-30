@@ -7,7 +7,7 @@ Let's suppose we have a `Post` schema and we want to generate a slug from `title
 
 ```elixir
 defmodule Post do
-  import Slugy, only: [slugify: 2]
+  import Slugy
 
   schema "posts" do
     field :title, :string
