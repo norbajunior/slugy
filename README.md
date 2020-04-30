@@ -145,7 +145,7 @@ Add to your `mix.exs` file.
 ```elixir
 def deps do
   [
-    {:slugy, "~> 4.0.0"}
+    {:slugy, "~> 4.0.2"}
   ]
 end
 ```
