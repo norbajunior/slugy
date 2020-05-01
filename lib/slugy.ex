@@ -94,7 +94,7 @@ defmodule Slugy do
 
   ## Routes
 
-  And lastly for having our routes with the slug we just need to implement the `Phoenix.Param` protocol to our slugified schemas. `Phoenix.Param` will extract the slug in place of the `:id`.
+  And lastly if you want to have your routes with the slug as the `:id` param implement the `Phoenix.Param` protocol to your slugified schema. `Phoenix.Param` will extract the slug in place of the `:id`.
 
       defmodule Post do
         @derive {Phoenix.Param, key: :slug}

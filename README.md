@@ -3,7 +3,7 @@
 
 A Phoenix library to generate slug for your schema fields
 
-Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desireable field. `slugify/2` generates the slug and put it to the changeset.
+Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desired field. `slugify/2` generates the slug and put it to the changeset.
 
 ```elixir
 defmodule Post do
@@ -34,7 +34,7 @@ iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
 
 ### Usage
 
-The `slugify/2` expects a changeset as a first parameter and an atom on the second one. The function will check if there is a change on the `title` field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
+The `slugify/2` expects a changeset as a first parameter and an atom key on the second one. The function will check if there is a change on the "key" field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
 ```
 iex> Slugy.slugify(changeset, :title)
@@ -43,7 +43,7 @@ iex> Slugy.slugify(changeset, :title)
 
 ### Composed slug
 
-If you want a custom composed slug for more than one field **e.g.** a content `name` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of fields.
+If you want a composed slug **e.g.** a content `name` and the `type` like so `"how-to-use-slugy-video"` you need to pass the `with` key that expects a list of fields.
 
 ```elixir
 defmodule Content do
@@ -92,7 +92,7 @@ iex> Slugy.slugify("Slugy is awesome")
 
 ## Routes
 
-And lastly for having our routes with the slug we just need to implement the `Phoenix.Param` protocol to our slugified schemas. `Phoenix.Param` will extract the slug in place of the `:id`.
+And lastly if you want to have your routes with the slug as the `:id` param implement the `Phoenix.Param` protocol to your slugified schema. `Phoenix.Param` will extract the slug in place of the `:id`.
 
 ```elixir
 defmodule Post do
@@ -145,7 +145,7 @@ Add to your `mix.exs` file.
 ```elixir
 def deps do
   [
-    {:slugy, "~> 4.0.2"}
+    {:slugy, "~> 4.0.3"}
   ]
 end
 ```
