@@ -145,7 +145,7 @@ Add to your `mix.exs` file.
 ```elixir
 def deps do
   [
-    {:slugy, "~> 4.0.3"}
+    {:slugy, "~> 4.1.0"} # compatible with ecto >= 3.5
   ]
 end
 ```
