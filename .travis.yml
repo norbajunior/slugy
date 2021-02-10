@@ -2,5 +2,5 @@ language: elixir
 
 matrix:
   include:
-    - elixir: '1.7'
+    - elixir: '1.8'
       otp_release: '21.0'
