@@ -1,4 +1,5 @@
 # Slugy
+
 [![Build Status](https://travis-ci.com/norbajunior/slugy.svg?branch=master)](https://travis-ci.com/norbajunior/slugy)
 
 A Phoenix library to generate slug for your schema fields
@@ -25,18 +26,18 @@ end
 
 Running this code on iex console you can see the slug generated as a new change to be persisted.
 
-```
+```elixir
 iex> changeset = Post.changeset(%Post{}, %{title: "A new Post"})
 %Ecto.Changeset{changes: %{title: "A new Post", slug: "a-new-post"}}
 ```
 
 `slugify/2` just generates a slug if the field's value passed to `slugify/2` comes with a new value to persist in `attrs` (in update cases) or if the struct is a new record to save.
 
-### Usage
+## Usage
 
 The `slugify/2` expects a changeset as a first parameter and an atom key on the second one. The function will check if there is a change on the "key" field and if affirmative generates the slug and assigns to the `slug` field, otherwise do nothing and just returns the changeset.
 
-```
+```elixir
 iex> Slugy.slugify(changeset, :title)
 %Ecto.Changeset{changes: %{slug: "content-1"}}
 ```
@@ -57,7 +58,7 @@ defmodule Content do
 end
 ```
 
-```
+```elixir
 iex> Content.changeset(%Content{}, %{name: "How to use Slugy", type: "video"}).changes
 %{slug: "How to use Slugy", type: "video", slug: "how-to-use-slugy-video"}
 ```
@@ -74,23 +75,25 @@ For example by having a struct like below and we want a slug from `data -> title
   data: %{title: "Content 1", external_id: 1}
 }
 ```
+
 Just pass a list with the keys following the path up to the desirable field.
 
-```
+```elixir
 iex> Slugy.slugify(changeset, [:data, :title])
 %Ecto.Changeset{changes: %{slug: "content-1"}}
 ```
 
 ### Without a changeset
+
 In cases we just want to get the slug string without a changeset involved we can use
 `slugify/1` to achieve that.
 
-```
+```elixir
 iex> Slugy.slugify("Slugy is awesome")
 "slugy-is-awesome"
 ```
 
-## Routes
+### Routes
 
 And lastly if you want to have your routes with the slug as the `:id` param implement the `Phoenix.Param` protocol to your slugified schema. `Phoenix.Param` will extract the slug in place of the `:id`.
 
@@ -152,14 +155,14 @@ end
 
 Don’t forget to update your dependencies.
 
-```
-$ mix deps.get
+```sh
+mix deps.get
 ```
 
-# Documentation
+## Documentation
 
 You can also find the docs here [https://hexdocs.pm/slugy](https://hexdocs.pm/slugy).
 
-# Contribute
+## Contribute
 
 Feel free to contribute to this project. If you have any suggestions or bug reports just open an issue or a PR.

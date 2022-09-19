@@ -4,7 +4,7 @@ defmodule Slugy do
 
   ## Examples
 
-  Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desireable field. `slugify/2` generates the slug and put it to the changeset.
+  Let's suppose we have a `Post` schema and we want to generate a slug from `title` field and save it to the `slug` field. To achieve that we need to call `slugify/2` following the changeset pipeline passing the desirable field. `slugify/2` generates the slug and put it to the changeset.
 
       defmodule Post do
         use Ecto.Schema
